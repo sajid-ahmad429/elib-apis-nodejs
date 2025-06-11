@@ -1,0 +1,21 @@
+{
+  "name": "elib-apis-nodejs",
+  "version": "1.0.0",
+  "description": "create a new project using node js express and typescripts",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.ts"
+  },
+  "keywords": [
+    "restful",
+    "apis"
+  ],
+  "author": "Sajid Ahmad <sajidahmad.9005@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
