@@ -1,10 +1,9 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import { createUsers } from "./controllers/userController";
 const router = Router();
 
 // ====== Routes ======
 
 // ➕ POST: Add Users
-router.post("/register", (req: Request, res: Response) => {
-    res.status(200).json({message: "welcome"});
-});
+router.post("/register", createUsers);
 export default router;
