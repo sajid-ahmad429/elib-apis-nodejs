@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
+import { config } from "../../../config/config";
 import User from "../models/userModel";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const createUsers = async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -45,10 +47,32 @@ export const createUsers = async (req: Request, res: Response) => {
 
         await newUser.save();
 
+        // Generate JWT Token
+        const payload = {
+            userId: newUser._id,
+            email: newUser.email,
+            role: newUser.role,
+        };
+
+        const token = jwt.sign(
+            payload,
+            config.jwt.secret || "default_secure_secret", // replace with env var in production
+            { expiresIn: "7d" } // Token expires in 1 hour
+        );
+
         res.status(201).json({
             status: 201,
             message: "User created successfully",
-            data: newUser,
+            data: {
+                id: newUser._id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                userName: newUser.userName,
+                email: newUser.email,
+                role: newUser.role,
+                status: newUser.status,
+            },
+            token,
         });
     } catch (error) {
         console.error("Error creating user:", error);

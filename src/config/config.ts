@@ -37,11 +37,11 @@ export const config = Object.freeze({
   },
 
   // Uncomment and configure JWT if authentication is needed
-  // jwt: {
-  //   // Secret key used for signing JWT tokens
-  //   secret: process.env.JWT_SECRET || '',
+  jwt: {
+    // Secret key used for signing JWT tokens
+    secret: process.env.JWT_SECRET || '',
 
-  //   // Token expiration time (e.g., '1h', '7d')
-  //   expiresIn: process.env.JWT_EXPIRES_IN || '1h',
-  // },
+    // Token expiration time (e.g., '1h', '7d')
+    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+  },
 });
