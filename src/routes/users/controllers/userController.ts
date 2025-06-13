@@ -1,31 +1,60 @@
-// userController.ts
 import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import User from "../models/userModel";
+import bcrypt from "bcryptjs";
 
 export const createUsers = async (req: Request, res: Response) => {
-    try {
-        const { name, email, password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({
+            status: 422,
+            message: "Validation failed",
+            errors: errors.array(),
+        });
+    }
 
-        // Basic validation
-        if (!name || !email || !password) {
-            res.status(400).json({ msg: "Name, email, and password are required." });
+    const { firstName, lastName, userName, email, password, role, status } = req.body;
+
+    if (!password) {
+        res.status(400).json({
+            status: 400,
+            message: "Password is required",
+        });
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            res.status(400).json({
+                status: 400,
+                message: "User already exists",
+            });
         }
 
-        // Simulate user creation (replace with real DB logic)
-        const newUser = {
-            id: Date.now(), // Just for demonstration
-            name,
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            firstName,
+            lastName,
+            userName,
             email,
-            password, // In real apps, NEVER store plain passwords
-        };
+            password: hashedPassword,
+            role,
+            status,
+        });
 
-        console.log("User created:", newUser);
+        await newUser.save();
 
-        res.status(201).json({ msg: "User created successfully", user: newUser });
+        res.status(201).json({
+            status: 201,
+            message: "User created successfully",
+            data: newUser,
+        });
     } catch (error) {
         console.error("Error creating user:", error);
-        res.status(500).json({ msg: "Internal server error" });
+        res.status(500).json({
+            status: 500,
+            message: "Server error",
+        });
     }
 };
-
-
-module.exports = { createUsers };

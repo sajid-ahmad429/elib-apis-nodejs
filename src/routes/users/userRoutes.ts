@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { registerUserValidator } from "../../validators/userValidator";
 import { createUsers } from "./controllers/userController";
+
 const router = Router();
 
-// ====== Routes ======
+router.post("/register", registerUserValidator, createUsers);
 
-// ➕ POST: Add Users
-router.post("/register", createUsers);
 export default router;
