@@ -3,6 +3,7 @@ import { notFound, errorHandler } from "./middlewares/errorHandler";
 import { getFormattedDate } from "./utils/dateFormatter";
 import testRoutes from "./routes/test.route";
 import usersRoutes from "./routes/users/userRoutes";
+import bookRoutes from "./routes/book/bookRoutes";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // ====== Routes ======
 app.use("/api", testRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/books", bookRoutes);
 
 // ====== Default Route ======
 app.get("/", (req: Request, res: Response) => {

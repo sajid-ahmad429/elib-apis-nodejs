@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-export const registerUserValidator = [
+const registerUserValidator = [
   body("firstName")
     .notEmpty().withMessage("First name is required"),
 
@@ -27,3 +27,15 @@ export const registerUserValidator = [
     .notEmpty().withMessage("Status is required")
     .isIn(["active", "inactive", "suspended"]).withMessage("Status must be active, inactive, or suspended"),
 ];
+
+
+const loginUserValidator = [
+  body("email")
+    .notEmpty().withMessage("Email is required")
+    .isEmail().withMessage("Please enter a valid email"),
+
+  body("password")
+    .notEmpty().withMessage("Password is required"),
+];
+
+export { registerUserValidator, loginUserValidator };
