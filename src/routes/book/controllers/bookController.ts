@@ -173,7 +173,6 @@ const getBookById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 /**
  * Main controller to create a book.
  */
