@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { validationResult } from "express-validator";
-import Book from "../models/bookModel";
 import { Request, Response } from "express";
+import Book from "../models/bookModel";
 import cloudinary from "../../../config/cloudinary";
 import streamifier from "streamifier";
-import fs from "fs";
-import path from "path";
 
 const allowedImageMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const allowedFileMimeTypes = ["application/pdf"];
 
 /**
- * Uploads a buffer to Cloudinary in a specified folder.
+ * Uploads buffer data to Cloudinary.
  */
 const uploadToCloudinary = (
   file: Express.Multer.File,
@@ -48,20 +46,8 @@ const uploadToCloudinary = (
 };
 
 /**
- * Saves file buffer to local folder at public/data/upload
+ * Main controller to create a book.
  */
-const saveFileLocally = (file: Express.Multer.File, folder: string): string => {
-  const uploadDir = path.join(__dirname, "..", "..", "public", "data", folder);
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const filePath = path.join(uploadDir, file.originalname);
-  fs.writeFileSync(filePath, file.buffer);
-
-  return filePath;
-};
-
 const createBook = async (req: Request, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -95,7 +81,7 @@ const createBook = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check for existing ISBN
+    // Check if ISBN already exists
     const existingBook = await Book.findOne({ isbn: isbn.trim() });
     if (existingBook) {
       res.status(400).json({ status: 400, message: "Book with this ISBN already exists" });
@@ -112,49 +98,43 @@ const createBook = async (req: Request, res: Response): Promise<void> => {
     const coverImage = files.coverImage?.[0];
     const bookFile = files.file?.[0];
 
-    // Validate coverImage
-    if (!coverImage) {
-      res.status(400).json({ status: 400, message: "Cover image is required" });
-      return;
-    }
-    if (!allowedImageMimeTypes.includes(coverImage.mimetype)) {
-      res.status(400).json({ status: 400, message: "Invalid cover image format. Allowed formats: JPEG, PNG, GIF, WEBP" });
-      return;
-    }
-
-    // Validate bookFile
-    if (!bookFile) {
-      res.status(400).json({ status: 400, message: "Book file (PDF) is required" });
-      return;
-    }
-    if (!allowedFileMimeTypes.includes(bookFile.mimetype)) {
-      res.status(400).json({ status: 400, message: "Invalid book file format. Only PDF files are allowed" });
+    // Validate cover image
+    if (!coverImage || !allowedImageMimeTypes.includes(coverImage.mimetype)) {
+      res.status(400).json({
+        status: 400,
+        message: "Invalid or missing cover image. Allowed formats: JPEG, PNG, GIF, WEBP",
+      });
       return;
     }
 
-    // Save locally
-    saveFileLocally(coverImage, "upload");
-    saveFileLocally(bookFile, "upload");
+    // Validate book file
+    if (!bookFile || !allowedFileMimeTypes.includes(bookFile.mimetype)) {
+      res.status(400).json({
+        status: 400,
+        message: "Invalid or missing book file. Only PDF files are allowed",
+      });
+      return;
+    }
 
-    // Upload to Cloudinary
-    const coverImagePath = await uploadToCloudinary(coverImage, "books/coverImages");
-    const bookFilePath = await uploadToCloudinary(bookFile, "books/files");
+    // Upload files to Cloudinary
+    const coverImageUrl = await uploadToCloudinary(coverImage, "books/coverImages");
+    const bookFileUrl = await uploadToCloudinary(bookFile, "books/files");
 
-    // Save to MongoDB
+    // Save book in DB
     const newBook = new Book({
-      title: title.trim(),
+      title: title?.trim(),
       genre: genre?.trim() || "",
-      author: author.trim(),
-      isbn: isbn.trim(),
+      author: author?.trim(),
+      isbn: isbn?.trim(),
       publishedDate: parsedDate,
-      category: category.trim(),
+      category: category?.trim(),
       language: language?.trim() || "",
       pages: pages ? Number(pages) : 0,
       publisher: publisher?.trim() || "",
       price: Number(price),
       status: status || "available",
-      coverImage: coverImagePath,
-      file: bookFilePath,
+      coverImage: coverImageUrl,
+      file: bookFileUrl,
     });
 
     await newBook.save();
@@ -169,7 +149,7 @@ const createBook = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: 500,
       message: "Server error",
-      error: error?.message || "Unknown error"
+      error: error?.message || "Unknown error",
     });
   }
 };
