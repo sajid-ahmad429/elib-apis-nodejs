@@ -5,9 +5,9 @@ const addBookValidator = [
     .notEmpty()
     .withMessage("Book title is required"),
 
-  body("author")
-    .notEmpty()
-    .withMessage("Author is required"),
+  // body("author")
+  //   .notEmpty()
+  //   .withMessage("Author is required"),
 
   body("isbn")
     .notEmpty()

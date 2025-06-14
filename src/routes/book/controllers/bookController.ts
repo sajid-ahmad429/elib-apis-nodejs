@@ -62,7 +62,6 @@ const createBook = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
       title,
-      author,
       isbn,
       publishedDate,
       category,
@@ -119,12 +118,12 @@ const createBook = async (req: Request, res: Response): Promise<void> => {
     // Upload files to Cloudinary
     const coverImageUrl = await uploadToCloudinary(coverImage, "books/coverImages");
     const bookFileUrl = await uploadToCloudinary(bookFile, "books/files");
-
+    
     // Save book in DB
     const newBook = new Book({
       title: title?.trim(),
       genre: genre?.trim() || "",
-      author: author?.trim(),
+      author: req.userId,
       isbn: isbn?.trim(),
       publishedDate: parsedDate,
       category: category?.trim(),
