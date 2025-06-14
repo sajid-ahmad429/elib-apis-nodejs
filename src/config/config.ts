@@ -6,9 +6,14 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 // List of essential environment variables required for the app to run
-const requiredEnvVars = ['PORT', 'DATABASE_URL'];
+const requiredEnvVars = [
+  'PORT',
+  'DATABASE_URL',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+];
 
-// Check for missing required environment variables
 requiredEnvVars.forEach((key) => {
   if (!process.env[key]) {
     throw new Error(`❌ Missing required environment variable: ${key}`);
@@ -21,27 +26,23 @@ requiredEnvVars.forEach((key) => {
  */
 export const config = Object.freeze({
   app: {
-    // Application name (optional, useful for logging or display)
     name: 'FleetTrack-API',
-
-    // Port on which the server will run (defaults to 9009 if not specified)
     port: parseInt(process.env.PORT || '9009', 10),
-
-    // Application environment (e.g., development, production)
     env: process.env.NODE_ENV || 'development',
   },
 
   db: {
-    // Full database connection URL (required)
     url: process.env.DATABASE_URL || '',
   },
 
-  // Uncomment and configure JWT if authentication is needed
   jwt: {
-    // Secret key used for signing JWT tokens
     secret: process.env.JWT_SECRET || '',
-
-    // Token expiration time (e.g., '1h', '7d')
     expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+  },
+
+  cloudinary: {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+    api_key: process.env.CLOUDINARY_API_KEY!,
+    api_secret: process.env.CLOUDINARY_API_SECRET!,
   },
 });

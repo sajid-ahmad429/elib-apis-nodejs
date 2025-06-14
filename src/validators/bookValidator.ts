@@ -7,7 +7,7 @@ const addBookValidator = [
 
   body("author")
     .notEmpty()
-    .withMessage("Author name is required"),
+    .withMessage("Author is required"),
 
   body("isbn")
     .notEmpty()
@@ -22,6 +22,22 @@ const addBookValidator = [
   body("category")
     .notEmpty()
     .withMessage("Book category is required"),
+
+  body("genre")
+    .notEmpty()
+    .withMessage("Book genre is required"),
+
+  // body("coverImage")
+  //   .notEmpty()
+  //   .withMessage("Cover image is required")
+  //   .matches(/\.(jpg|jpeg|png|gif|webp)$/i)
+  //   .withMessage("Cover image must be a valid image format (.jpg, .png, .webp, etc.)"),
+
+  // body("file")
+  //   .notEmpty()
+  //   .withMessage("Digital file is required")
+  //   .matches(/\.(pdf|epub|mobi)$/i)
+  //   .withMessage("File must be in .pdf, .epub, or .mobi format"),
 
   body("price")
     .notEmpty()
